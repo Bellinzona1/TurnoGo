@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TurnoGo — API Docs</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f1117;
+      --surface:   #1a1d2e;
+      --border:    #2a2d3e;
+      --text:      #e2e8f0;
+      --muted:     #94a3b8;
+      --accent:    #6366f1;
+      --GET:       #22c55e;
+      --POST:      #3b82f6;
+      --PUT:       #f59e0b;
+      --DELETE:    #ef4444;
+      --PATCH:     #a855f7;
+      --auth-bg:   #1e293b;
+      --auth-text: #f59e0b;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #1a1d2e 0%, #0f1117 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 2.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+    header .logo {
+      width: 44px; height: 44px;
+      background: var(--accent);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+    }
+    header h1 { font-size: 1.6rem; font-weight: 700; }
+    header p  { color: var(--muted); font-size: 0.9rem; margin-top: 0.2rem; }
+    .base-url {
+      margin-left: auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.4rem 0.9rem;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+
+    /* ── Layout ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem; }
+
+    /* ── Section ── */
+    .section { margin-bottom: 2.5rem; }
+    .section-header {
+      display: flex; align-items: center; gap: 0.8rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-title { font-size: 1.15rem; font-weight: 600; }
+    .section-prefix {
+      font-family: monospace;
+      font-size: 0.8rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 0.2rem 0.55rem;
+      color: var(--muted);
+    }
+    .endpoint-count {
+      margin-left: auto;
+      font-size: 0.75rem;
+      color: var(--muted);
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 0.15rem 0.6rem;
+      border: 1px solid var(--border);
+    }
+
+    /* ── Endpoint row ── */
+    .endpoint {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 0.6rem;
+      display: grid;
+      grid-template-columns: 68px 1fr auto;
+      align-items: center;
+      gap: 1rem;
+      transition: border-color 0.15s;
+    }
+    .endpoint:hover { border-color: var(--accent); }
+
+    .method {
+      font-family: monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 0.25rem 0;
+      border-radius: 5px;
+      letter-spacing: 0.5px;
+    }
+    .method.GET    { background: #14532d; color: var(--GET); }
+    .method.POST   { background: #1e3a5f; color: var(--POST); }
+    .method.PUT    { background: #451a03; color: var(--PUT); }
+    .method.DELETE { background: #450a0a; color: var(--DELETE); }
+    .method.PATCH  { background: #3b0764; color: var(--PATCH); }
+
+    .endpoint-info { min-width: 0; }
+    .endpoint-path {
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .endpoint-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+    }
+
+    .badge-auth {
+      font-size: 0.7rem;
+      font-weight: 600;
+      background: #422006;
+      color: var(--auth-text);
+      border: 1px solid #78350f;
+      border-radius: 4px;
+      padding: 0.15rem 0.45rem;
+      white-space: nowrap;
+    }
+
+    /* ── Legend ── */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+      padding: 1rem 1.2rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--muted); }
+    .legend-dot  { width: 10px; height: 10px; border-radius: 3px; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🗓</div>
+  <div>
+    <h1>TurnoGo API</h1>
+    <p>Documentación de endpoints del servidor</p>
+  </div>
+  <span class="base-url">http://localhost:8080</span>
+</header>
+
+<div class="container">
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:#22c55e"></span> GET</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span> POST</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span> PUT</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#ef4444"></span> DELETE</div>
+    <div class="legend-item" style="margin-left:auto">
+      <span class="badge-auth">🔒 Auth</span>
+      <span style="margin-left:4px">Requiere token JWT en header <code style="font-size:0.78rem">Authorization: Bearer &lt;token&gt;</code></span>
+    </div>
+  </div>
+
+  <!-- ── USERS ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">👤 Usuarios</span>
+      <span class="section-prefix">/api/users</span>
+      <span class="endpoint-count">7 endpoints</span>
+    </div>
+
+    <div class="endpoint">
+      <span class="method GET">GET</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/users/</div>
+        <div class="endpoint-desc">Obtener todos los usuarios (sin contraseña)</div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/users/RegisterUser</div>
+        <div class="endpoint-desc">Registrar nuevo usuario — Body: <code>name, email, password, imageProfile, accountStatus</code></div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/users/LoginUser</div>
+        <div class="endpoint-desc">Iniciar sesión con email y contraseña — Body: <code>email, password</code></div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/users/LoginGoogle</div>
+        <div class="endpoint-desc">Iniciar sesión con Google (Firebase) — Body: <code>idToken</code></div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method GET">GET</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/users/profile</div>
+        <div class="endpoint-desc">Obtener perfil del usuario autenticado</div>
+      </div>
+      <span class="badge-auth">🔒 Auth</span>
+    </div>
+
+    <div class="endpoint">
+      <span class="method GET">GET</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/users/:id</div>
+        <div class="endpoint-desc">Obtener usuario por ID (con emprendimiento populado)</div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method PUT">PUT</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/users/update/:id</div>
+        <div class="endpoint-desc">Actualizar datos de usuario — Body: campos a actualizar</div>
+      </div>
+      <span class="badge-auth">🔒 Auth</span>
+    </div>
+  </div>
+
+  <!-- ── EMPRENDIMIENTOS ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">🏢 Emprendimientos</span>
+      <span class="section-prefix">/api/emprendimientos</span>
+      <span class="endpoint-count">9 endpoints</span>
+    </div>
+
+    <div class="endpoint">
+      <span class="method GET">GET</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/emprendimientos/</div>
+        <div class="endpoint-desc">Obtener todos los emprendimientos</div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method GET">GET</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/emprendimientos/getByname/:name</div>
+        <div class="endpoint-desc">Obtener emprendimiento por nombre (dominio)</div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/emprendimientos/:id</div>
+        <div class="endpoint-desc">Crear emprendimiento para un usuario — Body: <code>nombre, dominio, descripcion</code></div>
+      </div>
+      <span class="badge-auth">🔒 Auth</span>
+    </div>
+
+    <div class="endpoint">
+      <span class="method GET">GET</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/emprendimientos/:id</div>
+        <div class="endpoint-desc">Obtener emprendimiento del usuario (con turnos populados)</div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method PUT">PUT</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/emprendimientos/:id</div>
+        <div class="endpoint-desc">Editar emprendimiento del usuario — Body: campos a actualizar</div>
+      </div>
+      <span class="badge-auth">🔒 Auth</span>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/emprendimientos/servicio/:emprendimientoId</div>
+        <div class="endpoint-desc">Agregar servicio al emprendimiento — Body: <code>servicio</code></div>
+      </div>
+      <span class="badge-auth">🔒 Auth</span>
+    </div>
+
+    <div class="endpoint">
+      <span class="method DELETE">DELETE</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/emprendimientos/servicio/:emprendimientoId</div>
+        <div class="endpoint-desc">Eliminar servicio del emprendimiento — Body: <code>servicio</code></div>
+      </div>
+      <span class="badge-auth">🔒 Auth</span>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/emprendimientos/red/:emprendimientoId</div>
+        <div class="endpoint-desc">Agregar red social al emprendimiento — Body: <code>{ nombre, url }</code></div>
+      </div>
+      <span class="badge-auth">🔒 Auth</span>
+    </div>
+
+    <div class="endpoint">
+      <span class="method DELETE">DELETE</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/emprendimientos/redes/:emprendimientoId</div>
+        <div class="endpoint-desc">Limpiar todas las redes sociales del emprendimiento</div>
+      </div>
+      <span class="badge-auth">🔒 Auth</span>
+    </div>
+  </div>
+
+  <!-- ── TURNOS ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">📅 Turnos</span>
+      <span class="section-prefix">/api/turnos</span>
+      <span class="endpoint-count">9 endpoints</span>
+    </div>
+
+    <div class="endpoint">
+      <span class="method GET">GET</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/turnos/</div>
+        <div class="endpoint-desc">Obtener todos los turnos</div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method GET">GET</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/turnos/emprendimiento/:emprendimientoId</div>
+        <div class="endpoint-desc">Obtener todos los turnos de un emprendimiento específico</div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method GET">GET</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/turnos/:id</div>
+        <div class="endpoint-desc">Obtener turno por ID</div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/turnos/:emprendimientoId</div>
+        <div class="endpoint-desc">Crear nuevo turno — Body: <code>titulo, nombre, imagen, valor</code></div>
+      </div>
+      <span class="badge-auth">🔒 Auth</span>
+    </div>
+
+    <div class="endpoint">
+      <span class="method PUT">PUT</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/turnos/:id</div>
+        <div class="endpoint-desc">Editar turno — Body: <code>titulo, nombre, imagen, valor</code></div>
+      </div>
+      <span class="badge-auth">🔒 Auth</span>
+    </div>
+
+    <div class="endpoint">
+      <span class="method DELETE">DELETE</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/turnos/:id</div>
+        <div class="endpoint-desc">Eliminar turno por ID</div>
+      </div>
+      <span class="badge-auth">🔒 Auth</span>
+    </div>
+
+    <div class="endpoint">
+      <span class="method GET">GET</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/turnos/:id/reservas</div>
+        <div class="endpoint-desc">Obtener turno con todas sus reservas</div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/turnos/:id/reservas</div>
+        <div class="endpoint-desc">Agregar reserva a un turno — Body: <code>nombreCliente, telefonoCliente, pago, fecha, estado, price</code></div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method DELETE">DELETE</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/turnos/:id/reservas/:reservaId</div>
+        <div class="endpoint-desc">Eliminar una reserva de un turno por su ID</div>
+      </div>
+      <span class="badge-auth">🔒 Auth</span>
+    </div>
+  </div>
+
+  <!-- ── MERCADOPAGO ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">💳 MercadoPago</span>
+      <span class="section-prefix">/api/mercadopago</span>
+      <span class="endpoint-count">6 endpoints</span>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/mercadopago/token</div>
+        <div class="endpoint-desc">Conectar cuenta de MercadoPago (OAuth) — Body: <code>code, code_verifier, userId_body</code></div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/mercadopago/desconectar</div>
+        <div class="endpoint-desc">Desconectar cuenta de MercadoPago — Body: <code>userId</code></div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/mercadopago/crear-preferencia</div>
+        <div class="endpoint-desc">Crear preferencia de pago para reserva — Body: <code>emprendimiento, price, nombreCancha, reserva, turnoId</code></div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/mercadopago/webhook</div>
+        <div class="endpoint-desc">Webhook de MercadoPago para pagos de reservas (query: <code>data.id, type</code>)</div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method GET">GET</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/mercadopago/planes</div>
+        <div class="endpoint-desc">Obtener planes disponibles de MercadoPago</div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/mercadopago/crear-plan</div>
+        <div class="endpoint-desc">Crear un nuevo plan de suscripción en MercadoPago</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── WEBHOOK ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">🔔 Webhooks</span>
+      <span class="section-prefix">/api/webhook</span>
+      <span class="endpoint-count">4 endpoints</span>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/webhook/mercadopago</div>
+        <div class="endpoint-desc">Procesar webhook de suscripciones de MercadoPago — Body: <code>type, data, action</code></div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method PUT">PUT</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/webhook/update-user-role</div>
+        <div class="endpoint-desc">Actualizar rol/plan del usuario según suscripción activa</div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/webhook/link-payer</div>
+        <div class="endpoint-desc">Vincular ID de pagador de MercadoPago con un usuario — Body: <code>payerId, email</code></div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/webhook/clear-user</div>
+        <div class="endpoint-desc">Limpiar datos de suscripción de un usuario — Body: <code>userId</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PLANES ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">📦 Planes</span>
+      <span class="section-prefix">/api/planes</span>
+      <span class="endpoint-count">4 endpoints</span>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/planes/crear-planes-app</div>
+        <div class="endpoint-desc">Crear todos los planes de la app en MercadoPago</div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method GET">GET</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/planes/test-connection</div>
+        <div class="endpoint-desc">Verificar conectividad con MercadoPago</div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method GET">GET</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/planes/configuracion-planes</div>
+        <div class="endpoint-desc">Obtener configuración actual de los planes (precios, nombres, features)</div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method PUT">PUT</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/planes/actualizar-precios</div>
+        <div class="endpoint-desc">Actualizar precios de los planes en MercadoPago — Body: precios nuevos</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SUBSCRIPTIONS ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">🔄 Suscripciones</span>
+      <span class="section-prefix">/api/subscriptions</span>
+      <span class="endpoint-count">3 endpoints</span>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/subscriptions/create-custom-subscription</div>
+        <div class="endpoint-desc">Iniciar suscripción a un plan — Body: <code>planType</code> (genera la URL de checkout de MP)</div>
+      </div>
+      <span class="badge-auth">🔒 Auth</span>
+    </div>
+
+    <div class="endpoint">
+      <span class="method POST">POST</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/subscriptions/test-mercadopago</div>
+        <div class="endpoint-desc">Verificar token de MercadoPago y datos de la cuenta</div>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <span class="method GET">GET</span>
+      <div class="endpoint-info">
+        <div class="endpoint-path">/api/subscriptions/test-connection</div>
+        <div class="endpoint-desc">Verificar conectividad con la API de MercadoPago</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>TurnoGo API &mdash; 42 endpoints &mdash; Puerto por defecto: 8080</footer>
+
+</body>
+</html>
