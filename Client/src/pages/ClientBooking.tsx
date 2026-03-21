@@ -8,7 +8,8 @@ import { TimeGrid } from "@/components/booking/TimeGrid";
 import { PaymentModal } from "@/components/booking/PaymentModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CircleDot, LogOut, ArrowLeft, ChevronRight } from "lucide-react";
+import { LogOut, ArrowLeft, ChevronRight } from "lucide-react";
+import logoImg from "@/assets/logo.png";
 
 type Step = "courts" | "schedule" | "payment";
 
@@ -21,7 +22,6 @@ export default function ClientBooking() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [step, setStep] = useState<Step>("courts");
-  const [paymentOpen, setPaymentOpen] = useState(false);
   const [timeSlots] = useState<TimeSlot[]>(generateTimeSlots());
 
   const filteredCourts = sportFilter === "all" ? courts : courts.filter((c) => c.sport === sportFilter);
@@ -36,6 +36,8 @@ export default function ClientBooking() {
     if (step === "schedule") {
       setStep("courts");
       setSelectedCourt(null);
+    } else if (step === "payment") {
+      setStep("schedule");
     }
   };
 
@@ -52,41 +54,48 @@ export default function ClientBooking() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-brand-gray via-blue-50 to-brand-gray">
+      {/* Decorative elements */}
+      <div className="fixed top-0 right-0 w-96 h-96 bg-brand-blue opacity-10 rounded-full blur-3xl -mr-48 -mt-48"></div>
+      <div className="fixed bottom-0 left-0 w-96 h-96 bg-brand-green opacity-10 rounded-full blur-3xl -ml-48 -mb-48"></div>
+
       {/* Header */}
-      <header className="bg-card border-b border-border sticky top-0 z-10">
+      <header className="bg-white border-b border-brand-gray sticky top-0 z-10 backdrop-blur-sm bg-white/80">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CircleDot className="h-6 w-6 text-primary" />
-            <span className="font-display font-bold text-lg text-foreground">MatchPoint</span>
+          <div className="flex items-center gap-3">
+            <img
+              src={logoImg}
+              alt="TurnoGo Logo"
+              className="w-auto h-10 sm:h-14 md:h-20 lg:h-32 xl:h-40"
+            />
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground hidden sm:block">Hola, {user?.name}</span>
-            <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-1 text-muted-foreground">
+            <span className="text-sm text-gray-600 hidden sm:block">Hola, {user?.name}</span>
+            <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-1 text-gray-600 hover:text-brand-blue">
               <LogOut className="h-4 w-4" /> Salir
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-6">
+      <main className="max-w-6xl mx-auto px-4 py-6 relative z-20">
         {step === "courts" && (
           <div className="animate-fade-up">
             <div className="mb-6">
-              <h1 className="text-2xl font-display font-bold text-foreground mb-1">Reserva tu cancha</h1>
-              <p className="text-muted-foreground">Selecciona una cancha para comenzar</p>
+              <h1 className="text-3xl font-display font-bold text-brand-blue-dark mb-1">Reserva tu cancha</h1>
+              <p className="text-brand-blue">Selecciona una cancha para comenzar</p>
             </div>
 
             {/* Sport filters */}
-            <div className="flex gap-2 mb-6">
+            <div className="flex gap-2 mb-6 flex-wrap">
               {sportFilters.map((f) => (
                 <button
                   key={f.key}
                   onClick={() => setSportFilter(f.key)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
                     sportFilter === f.key
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-card text-foreground border border-border hover:border-primary/50"
+                      ? "bg-gradient-to-r from-brand-green to-brand-green-dark text-white shadow-lg shadow-green-300/40"
+                      : "bg-white text-brand-blue-dark border-2 border-brand-gray hover:border-brand-blue hover:bg-blue-50"
                   }`}
                 >
                   {f.label}
@@ -105,7 +114,7 @@ export default function ClientBooking() {
 
         {step === "schedule" && selectedCourt && (
           <div className="animate-fade-up">
-            <button onClick={handleBack} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors">
+            <button onClick={handleBack} className="flex items-center gap-1 text-sm text-brand-blue hover:text-brand-blue-dark mb-4 transition-colors font-semibold">
               <ArrowLeft className="h-4 w-4" /> Volver a canchas
             </button>
 
@@ -113,12 +122,12 @@ export default function ClientBooking() {
               {/* Main content */}
               <div className="lg:col-span-2 space-y-6">
                 <div>
-                  <h2 className="text-xl font-display font-bold text-foreground mb-1">{selectedCourt.name}</h2>
-                  <Badge variant="secondary">{sportLabels[selectedCourt.sport]}</Badge>
+                  <h2 className="text-2xl font-display font-bold text-brand-blue-dark mb-2">{selectedCourt.name}</h2>
+                  <Badge variant="secondary" className="bg-brand-green text-white border-0 font-semibold">{sportLabels[selectedCourt.sport]}</Badge>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-3">Selecciona fecha</h3>
+                  <h3 className="text-sm font-semibold text-brand-blue-dark mb-3">Selecciona fecha</h3>
                   <DateStrip selectedDate={selectedDate} onDateSelect={setSelectedDate} />
                 </div>
 
@@ -127,34 +136,34 @@ export default function ClientBooking() {
 
               {/* Sticky summary sidebar */}
               <div className="mt-6 lg:mt-0">
-                <div className="bg-card border border-border rounded-lg p-5 lg:sticky lg:top-20 space-y-4">
-                  <h3 className="font-display font-semibold text-foreground">Resumen</h3>
+                <div className="bg-white border-2 border-brand-gray rounded-xl p-5 lg:sticky lg:top-20 space-y-4 shadow-lg">
+                  <h3 className="font-display font-bold text-brand-blue-dark">Resumen</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Cancha</span>
-                      <span className="font-medium">{selectedCourt.name}</span>
+                      <span className="text-brand-green font-semibold">Cancha</span>
+                      <span className="font-semibold text-brand-blue-dark">{selectedCourt.name}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Fecha</span>
-                      <span className="font-medium">{selectedDate.toLocaleDateString("es", { day: "numeric", month: "short" })}</span>
+                      <span className="text-brand-green font-semibold">Fecha</span>
+                      <span className="font-semibold text-brand-blue-dark">{selectedDate.toLocaleDateString("es", { day: "numeric", month: "short" })}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Hora</span>
-                      <span className="font-medium">{selectedTime || "—"}</span>
+                      <span className="text-brand-green font-semibold">Hora</span>
+                      <span className="font-semibold text-brand-blue-dark">{selectedTime || "—"}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Duración</span>
-                      <span className="font-medium">1 hora</span>
+                      <span className="text-brand-green font-semibold">Duración</span>
+                      <span className="font-semibold text-brand-blue-dark">1 hora</span>
                     </div>
                   </div>
-                  <div className="border-t border-border pt-3 flex justify-between items-center">
-                    <span className="font-display font-semibold">Total</span>
-                    <span className="text-2xl font-display font-bold text-primary">${selectedCourt.pricePerHour}</span>
+                  <div className="border-t-2 border-brand-gray pt-3 flex justify-between items-center">
+                    <span className="font-display font-bold text-brand-blue-dark">Total</span>
+                    <span className="text-2xl font-display font-bold text-brand-green">${selectedCourt.pricePerHour}</span>
                   </div>
                   <Button
-                    className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-bold h-11 gap-2"
+                    className="w-full bg-gradient-to-r from-brand-green to-brand-green-dark hover:from-brand-green-dark hover:to-brand-green text-white font-bold h-11 gap-2 shadow-lg shadow-green-300/40"
                     disabled={!selectedTime}
-                    onClick={() => setPaymentOpen(true)}
+                    onClick={() => setStep("payment")}
                   >
                     Continuar al pago <ChevronRight className="h-4 w-4" />
                   </Button>
@@ -163,15 +172,24 @@ export default function ClientBooking() {
             </div>
           </div>
         )}
+        {step === "payment" && selectedCourt && (
+          <div className="animate-fade-up">
+            <button onClick={handleBack} className="flex items-center gap-1 text-sm text-brand-blue hover:text-brand-blue-dark mb-6 transition-colors font-semibold">
+              <ArrowLeft className="h-4 w-4" /> Volver
+            </button>
+
+            <div className="flex justify-center">
+              <PaymentModal
+                court={selectedCourt}
+                date={selectedDate}
+                time={selectedTime}
+              />
+            </div>
+          </div>
+        )}
       </main>
 
-      <PaymentModal
-        open={paymentOpen}
-        onClose={() => { setPaymentOpen(false); setStep("courts"); setSelectedCourt(null); setSelectedTime(null); }}
-        court={selectedCourt}
-        date={selectedDate}
-        time={selectedTime}
-      />
+      {/* Remove old PaymentModal component usage */}
     </div>
   );
 }
